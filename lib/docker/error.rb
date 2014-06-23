@@ -34,4 +34,10 @@ module Docker::Error
 
   # Raised when an IO action fails.
   class IOError < DockerError; end
+
+  # Raised when an image is already pulled by another client
+  class ImagePullInProgress < DockerError; end
+
+  # Raised when image is not found
+  class ImageNotFound < DockerError; end
 end

@@ -99,8 +99,16 @@ class Docker::Image
       headers = !credentials.nil? && Docker::Util.build_auth_header(credentials)
       headers ||= {}
       body = conn.post('/images/create', opts, :headers => headers)
-      id = Docker::Util.fix_json(body).last['id']
-      new(conn, 'id' => id, :headers => headers)
+      # id = Docker::Util.fix_json(body).last['id']
+      data = Docker::Util.fix_json(body)
+      last_message = data.last || {}
+
+      if last_message['status'] =~ /already being pulled by another client. Waiting.$/
+        raise ImagePullInProgress, first_message
+      elsif last_message['error'] =~ /404/
+        raise ImageNotFound, "Image not found"
+      end
+      new(conn, 'id' => last_message['id'], :headers => headers)
     end
 
     # Return a specific image.
