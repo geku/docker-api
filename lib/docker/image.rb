@@ -104,9 +104,9 @@ class Docker::Image
       last_message = data.last || {}
 
       if last_message['status'] =~ /already being pulled by another client. Waiting.$/
-        raise ImagePullInProgress, first_message
+        raise Docker::Error::ImagePullInProgress, first_message
       elsif last_message['error'] =~ /404/
-        raise ImageNotFound, "Image not found"
+        raise Docker::Error::ImageNotFound, "Image not found"
       end
       new(conn, 'id' => last_message['id'], :headers => headers)
     end
